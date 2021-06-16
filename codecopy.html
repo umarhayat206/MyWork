@@ -1,6 +1,44 @@
 <html>
 <head></head>
 <body>
+   8.42.1
+
+Route::group(['middleware' => 'role:admin|super_admin|author'], function() {
+
+    Route::GET('/admin', [AdminController::class, 'index'])->name('admin.index');
+// admin categories
+    Route::GET('/admin/categories', [CategoriesController::class, 'index'])->name('admin.categories.index')->middleware(['permission:can_view_categories']);
+    Route::GET('/admin/category/create', [CategoriesController::class, 'create'])->name('admin.categories.create')->middleware(['permission:can_add_categories']);
+    Route::POST('/admin/category', [CategoriesController::class, 'store'])->name('admin.categories.store');
+    Route::GET('/admin/category/{id}/edit', [CategoriesController::class, 'edit'])->name('admin.categories.edit')->middleware(['permission:can_edit_categories']);
+    Route::PUT('/admin/category/{id}', [CategoriesController::class, 'update'])->name('admin.categories.update');
+    Route::Delete('/admin/category/{id}', [CategoriesController::class, 'delete'])->name('admin.categories.delete')->middleware(['permission:can_delete_categories']);
+    Route::GET('/search/category',[CategoriesController::class, 'searchCategory'])->name('categories.search');
+
+//admin posts
+
+    Route::GET('/admin/posts', [PostsController::class, 'index'])->name('admin.posts.index')->middleware(['permission:can_view_posts']);
+    Route::GET('/admin/post/create', [PostsController::class, 'create'])->name('admin.posts.create')->middleware(['permission:can_add_posts']);
+    Route::POST('/admin/post', [PostsController::class, 'store'])->name('admin.posts.store');
+    Route::GET('/admin/post/{id}/edit', [PostsController::class, 'edit'])->name('admin.posts.edit')->middleware(['permission:can_edit_posts']);
+    Route::PUT('/admin/post/{id}', [PostsController::class, 'update'])->name('admin.posts.update');
+    Route::Delete('/admin/post/{id}', [PostsController::class, 'delete'])->name('admin.posts.delete')->middleware(['permission:can_delete_posts']);
+    Route::GET('/search/post',[PostsController::class, 'searchPost'])->name('posts.search');
+//Admin Users
+    Route::GET('/admin/users',[UserController::class,'index'])->name('admin.users.index')->middleware(['permission:can_view_users']);
+    Route::GET('/admin/user/create', [UserController::class, 'create'])->name('admin.users.create')->middleware(['permission:can_add_users']);
+    Route::POST('/admin/user', [UserController::class, 'store'])->name('admin.users.store');
+    Route::GET('/admin/user/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit')->middleware(['permission:can_edit_users']);
+    Route::PUT('/admin/user/{id}', [UserController::class, 'update'])->name('admin.users.update');
+    Route::Delete('/admin/user/{id}', [UserController::class, 'delete'])->name('admin.users.delete')->middleware(['permission:can_delete_users']);
+    Route::GET('/admin/user/{id}',[UserController::class,'show'])->name('admin.users.show')->middleware(['permission:can_view_users']);
+    Route::GET('/search/user',[UserController::class, 'searchUser'])->name('users.search');
+
+});
+
+//show post by category
+//Route::GET("/category/{id}/posts");
+Route::GET('/category/{id}/posts',[PostsController::class,'showByCategory'])->name('category.post.show');
 
 
 
