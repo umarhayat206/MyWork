@@ -102,8 +102,213 @@ Route::GET('/category/{id}/posts',[PostsController::class,'showByCategory'])->na
 
 
 
+//quasar 
+
+main layout
+<template>
+  <q-layout view="hHh lpR ffr">
+    <q-header elevated class="text-light">
+      <q-toolbar>
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="leftDrawerOpen = !leftDrawerOpen"
+        />
+
+        <q-toolbar-title @click="$router.replace('/')" style="cursor: pointer">
+        Inventory System
+        </q-toolbar-title>
+
+<!--        <div ref="logout" style="cursor: pointer">-->
+<!--          <span>Welcome {{ name }}</span>-->
+<!--          <br/>-->
+<!--          <div class="text-center"><span v-if="isBusinessUser"> {{businessName}}</span></div>-->
+<!--          <q-menu :target="$refs.logout">-->
+<!--            <div class="row no-wrap q-pa-md">-->
+<!--              <div class="col-md-12">-->
+<!--                <q-btn flat label="My Account" icon="person" @click="editProfile"/>-->
+<!--                <q-btn flat label="Logout" icon="logout" @click="logout"/>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </q-menu>-->
+<!--        </div>-->
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      content-class="bg-grey-1"
+    >
+      <q-list>
+        <q-item-label
+          header
+          class="text-grey-8"
+        >
+          MAIN MENU
+        </q-item-label>
+        <EssentialLink
+          v-for="link in essentialLinks"
+          :key="link.title"
+          v-bind="link"
+        />
+      </q-list>
+    </q-drawer>
+
+    <q-page-container>
+      <router-view/>
+    </q-page-container>
+  </q-layout>
+</template>
+
+<script>
+  import EssentialLink from 'components/EssentialLink.vue'
+  export default {
+    name: 'MainLayout',
+    components: { EssentialLink },
+    data () {
+      return {
+        leftDrawerOpen: false,
+        essentialLinks: [
+          {
+            title: 'Categories',
+            icon: 'widgets',
+            link: { path: '/categories' },
+          },
+          {
+            title:'Attributes',
+            icon:'widgets',
+            link:{path:'/attributes'},
+          }
+        ]
+      }
+    }
+
+  }
+</script>
 
 
+// essential link component
+<template>
+<!--  <q-item v-if="!sub_menues"-->
+<!--          clickable-->
+<!--          tag="a"-->
+<!--          :to="link"-->
+<!--  >-->
+    <q-item clickable tag="a" :to="link">
+    <q-item-section v-if="icon" avatar>
+      <q-icon :name="icon"/>
+    </q-item-section>
+
+    <q-item-section>
+      <q-item-label>{{ title }}</q-item-label>
+      <q-item-label  caption>
+       {{caption}}
+      </q-item-label>
+    </q-item-section>
+  </q-item>
+
+<!--  <div v-else>-->
+    <!-- {{children}} -->
+<!--    <q-expansion-item-->
+<!--      expand-separator-->
+<!--      :label="title"-->
+<!--      :icon="icon"-->
+<!--      :caption="caption"-->
+<!--      default-closed>-->
+<!--      <EssentialLink-->
+<!--        v-for="(sub_menu,index) in sub_menues"-->
+<!--        :key="index"-->
+<!--        v-bind="sub_menu">-->
+<!--      </EssentialLink>-->
+<!--    </q-expansion-item>-->
+<!--  </div>-->
+
+</template>
+
+<script>
+  export default {
+    name: 'EssentialLink',
+    props: {
+      title: {
+        type: String,
+        required: true
+      },
+
+      caption: {
+        type: String,
+         default: ''
+      },
+
+      link: {
+        type: Object,
+        required: true
+      },
+
+      icon: {
+        type: String,
+        default: ''
+      }
+      // sub_menues: {
+      //   type: Array,
+      //   required: false
+      // }
+    },
+    methods: {
+
+    }
+  }
+</script>
+
+// routes.js
+
+const routes = [
+  {
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      // { path: '', component: () => import('pages/Index.vue') }
+    ]
+  },
+  {
+    path: '/categories',
+    // name: 'categories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Categories/index') },
+      { name: 'category', path: 'category', component: () => import('pages/Categories/Category.vue'), props: true }
+    ]
+  },
+  {
+    path: '/attributes',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CategoryAttributes/index') },
+       { name: 'attribute', path: 'attribute', component: () => import('pages/CategoryAttributes/Attribute.vue'), props: true }
+    ]
+  },
+  // {
+  //   path: '/category',
+  //   name: 'categories-create',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [
+  //     { path: '', component: () => import('pages/Categories/CreateCategory') }
+  //   ]
+  // },
+
+  // Always leave this as last one,
+  // but you can also remove it
+  {
+    path: '*',
+    component: () => import('pages/Error404.vue')
+  }
+]
+
+export default routes
 
 
 
