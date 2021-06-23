@@ -313,6 +313,187 @@ export default routes
 
 
 
+// item create and delete
+
+<template>
+  <q-page padding>
+    <div class="row">
+      <div class="col-8 offset-2">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6">{{title}} Item</div>
+            <q-input outlined type="text" v-model="name" label="Item Name"/>
+            <br>
+            <q-select
+              clearable
+              class="q-mb-md"
+              outlined
+              v-model="category"
+              label="Select Category"
+              use-input
+              :options="categories"
+              @input="fetchAttributes"
+            />
+            <div v-for="(attribute, index) in attributes" :key="index" >
+              <br>
+              <q-input v-if="attribute.type==1" type="text" v-model="attribute_name[index]"
+                       @input="addAttribute(attribute.id,attribute_name[index],attribute.type)" :label="attribute.name"
+                       outlined/>
+              <q-input v-if="attribute.type==2" type="textarea"
+                       @input="addAttribute(attribute.id,attribute_desc[index],attribute.type)" v-model="attribute_desc[index]"
+                       :label="attribute.name"
+                       outlined/>
+              <q-input v-if="attribute.type==3" type="time" @input="addAttribute(attribute.id,attribute_time[index],attribute
+              .type)"
+                       v-model="attribute_time[index]" :label="attribute.name"
+                       outlined>
+
+              </q-input>
+              <q-input v-if="attribute.type==4" type="date"
+                       @input="addAttribute(attribute.id,attribute_datetime[index],attribute.type)" v-model="attribute_datetime[index]"
+                       :label="attribute.name" outlined>
+              </q-input>
+              <q-input v-if="attribute.type==5" type="number"
+                       @input="addAttribute(attribute.id,attribute_number[index],attribute.type)" v-model="attribute_number[index]"
+                       :label="attribute.name"
+                       outlined/>
+              <q-select
+                clearable
+                class="q-mb-md"
+                outlined
+                @input="addAttribute(attribute.id,attribute_select[index],attribute.type)"
+                v-model="attribute_select[index]"
+                v-if="attribute.type==7"
+                :label="attribute.name"
+                :options="JSON.parse(attribute.options)"
+              />
+            </div>
+            <q-btn label="Save Item" type="submit" color="primary" @click="saveItem"/>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+  </q-page>
+</template>
+<script>
+  export default {
+    props:
+      {
+        item: {
+          type: Object,
+          default: null,
+          required: false,
+        }
+      },
+    data() {
+      return {
+        attribute_name: [],
+        attribute_desc: [],
+        attribute_time: [],
+        attribute_datetime: [],
+        attribute_number: [],
+        attribute_select: [],
+        name: null,
+        category: null,
+        categories: [],
+        selectedCategory: null,
+        attributes: [],
+        attributesValues:[],
+        actual_attributes: [],
+        isEdit: false,
+      }
+    },
+    computed:
+      {
+        title: function () {
+          return this.item !== null ? "Edit" : "Create";
+        }
+      },
+    methods: {
+      fetchCategories: function () {
+        this.$axios.get('/api/fetchcategories').then(response => {
+          this.categories = response.data.data;
+          if (this.isEdit != false) {
+            console.log("fetching categories ")
+            this.category = this.categories.find(e => e.value == this.item.category_id)
+            console.log("Category " + JSON.stringify(this.category))
+          }
+        }).catch(error => console.log(error)).finally()
+      },
+      fetchAttributes: function () {
+        this.selectedCategory = this.category != null ? this.category.value : null
+        console.log('selected input type is', this.selectedCategory);
+        this.$axios.get('/api/categoryattribute/' + this.selectedCategory).then(response => {
+          console.log('Response of attributes ' + JSON.stringify(response))
+          this.attributes = response.data.attributes;
+          console.log('Response of attributes ' + JSON.stringify(this.attributes))
+        }).catch(error => console.log(error)).finally()
+      },
+      addAttribute: function (id, value, type) {
+        console.log("ID " + id + " Value " + value)
+        if (type == 7 || type == 8) {
+          value = value.label;
+        }
+        var index = this.actual_attributes.findIndex(e => e.id == id);
+        console.log("Index " + index)
+        if (index != -1) {
+          this.actual_attributes.splice(index, 1);
+        }
+        this.actual_attributes.push({id: id, value: value,type:type});
+        console.log("Attributes " + JSON.stringify(this.actual_attributes));
+        //attributes.push({value:this.attribute_nam})
+      },
+      saveItem: function () {
+        console.log('the actual attributes is', JSON.stringify(this.actual_attributes));
+        this.$axios.post('/api/item/store',
+          {
+            name: this.name,
+            category: this.category.value,
+            actual_attributes: JSON.stringify(this.actual_attributes),
+          }).then(response => {
+          // this.resetFields()
+          this.$q.notify({
+            message: 'Item created successfully.',
+            color: 'secondary'
+          })
+          // this.id = response.data.attribute.id;
+          // console.log("the id is", this.id);
+          this.$router.replace({path: '/items'})
+          console.log(JSON.stringify(response.data.attributes))
+        }).catch(
+          // error => {
+          //   this.errors = error.response.data.errors
+          //   console.log('Errors ' + JSON.stringify(this.errors))
+          // }
+        ).finally({})
+      }
+    },
+
+    mounted() {
+      this.fetchCategories()
+      if (this.item != null) {
+        console.log("the curremt item is"+JSON.stringify(this.item))
+        this.isEdit = true;
+        this.name = this.item.name;
+        setTimeout(() => {
+          this.fetchAttributes();
+        }, 500)
+      }
+
+    }
+
+  }
+</script>
+<style scoped>
+  p {
+    color: red;
+  }
+</style>
+
+
+
+
+
 
 
 
