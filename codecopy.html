@@ -1,6 +1,8 @@
 <html>
 <head></head>
 <body>
+   
+// quasar login with token link is here    https://www.youtube.com/channel/UCJLGFWQfHhE9ENHHqgMXiow   
 
 https://blog.codecourse.com/setting-up-laravel-sanctum-airlock-for-spa-authentication-with-vue/
    https://www.codecheef.org/article/laravel-working-with-json-table-column-example
@@ -1035,6 +1037,138 @@ class CategoryAttributeCollection extends BaseCollection
 </style>
 
 
+/// routes file
+const routes = [
+  {
+    path: '/',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      // { path: '', component: () => import('pages/Index.vue') }
+    ]
+  },
+  {
+    path: '/dashboard',
+    // name: 'categories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Dasboard/Index.vue') },
+    ],
+    meta:{authOnly:true}
+  },
+  {
+    path: '/categories',
+    // name: 'categories',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Categories/Index') },
+      { name: 'category', path: 'category', component: () => import('pages/Categories/Category.vue'), props: true }
+    ],
+    meta:{authOnly:true}
+  },
+  {
+    path: '/attributes',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/CategoryAttributes/Index') },
+      { name: 'attribute', path: 'attribute', component: () => import('pages/CategoryAttributes/Attribute.vue'), props: true }
+    ],
+    meta:{authOnly:true}
+  },
+  {
+    path: '/items',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Items/Index') },
+      { name: 'item', path: 'item', component: () => import('pages/Items/Item.vue'), props: true }
+    ],
+    meta:{authOnly:true}
+  },
+  {
+    path: '/login',
+    component: () => import('pages/Auth/Login.vue'),
+    children: [
+      // { path: '', component: () => import('pages/Index.vue') }
+    ]
+  },
+  {
+    path: '/register',
+    component: () => import('pages/Auth/Register.vue'),
+    children: [
+      // { path: '', component: () => import('pages/Index.vue') }
+    ]
+  },
+  // {
+  //   path: '/category',
+  //   name: 'categories-create',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [
+  //     { path: '', component: () => import('pages/Categories/CreateCategory') }
+  //   ]
+  // },
+
+  // Always leave this as last one,
+  // but you can also remove it
+  {
+    path: '*',
+    component: () => import('pages/Error404.vue')
+  }
+]
+
+
+export default routes
+
+
+// in index.js of router.js
+
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+
+import routes from './routes'
+
+Vue.use(VueRouter)
+
+/*
+ * If not building with SSR mode, you can
+ * directly export the Router instantiation;
+ *
+ * The function below can be async too; either use
+ * async/await or return a Promise which resolves
+ * with the Router instance.
+ */
+
+export default function (/* { store, ssrContext } */) {
+  const Router = new VueRouter({
+    scrollBehavior: () => ({ x: 0, y: 0 }),
+    routes,
+
+    // Leave these as they are and change in quasar.conf.js instead!
+    // quasar.conf.js -> build -> vueRouterMode
+    // quasar.conf.js -> build -> publicPath
+    mode: process.env.VUE_ROUTER_MODE,
+    base: process.env.VUE_ROUTER_BASE
+  })
+  function loggedIn()
+{
+  return localStorage.getItem("uat");
+}
+Router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.authOnly)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!loggedIn()) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // make sure to always call next()!
+  }
+})
+  return Router
+}
 
 
 
