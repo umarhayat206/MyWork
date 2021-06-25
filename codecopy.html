@@ -2,6 +2,18 @@
 <head></head>
 <body>
    
+  //in axios.js for log in
+   
+   import Vue from 'vue'
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://application.local'
+Vue.prototype.$axios = axios
+
+axios.defaults.withCredentials = true;
+var token = localStorage.getItem('uat')
+axios.defaults.headers.common.Authorization = `Bearer ${token}`
+   
 // quasar login with token link is here    https://www.youtube.com/channel/UCJLGFWQfHhE9ENHHqgMXiow   
 
 https://blog.codecourse.com/setting-up-laravel-sanctum-airlock-for-spa-authentication-with-vue/
