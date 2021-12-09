@@ -1194,7 +1194,95 @@ Router.beforeEach((to, from, next) => {
 }
 
 
+// Techsphere
 
+//pie chart and bar chart
+
+<template>
+  <div class="content-margins main-body pt-0" style="margin-top: -70px">
+    <div class="date-selector">
+      <p class="fa fa-caret-left" style="margin: 0" @click="decreaseDate"></p>
+      <p style="margin: 0">{{ date }}</p>
+      <p class="fa fa-caret-right" style="margin: 0" @click="increaseDate"></p>
+    </div>
+    <div v-if="!loading" class="display-flex">
+      <food-list/>
+      <macros/>
+    </div>
+  </div>
+</template>
+
+<script>
+import FoodList from "./food-list";
+import Macros from "./macros";
+import {mapActions, mapState} from "vuex";
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
+import moment from 'moment';
+
+export default {
+  name: "nutrition",
+  components: {Macros, FoodList, DatePicker},
+  data() {
+    return {
+      loading: true,
+      nutrients: [],
+      nutrientsVals: [],
+      date: new moment().format('MMM DD, YYYY'),
+      dayCounter: 0
+    }
+  },
+  created() {
+    let memberId = this.fetchMemberId();
+    this.$store.commit('setMemberId', memberId);
+    this.getNutritionSummary().then(() => {
+      this.loading = false
+    })
+  },
+  computed: {
+    ...mapState(['start_date', 'end_date'])
+  },
+  methods: {
+    ...mapActions(['getNutritionSummary']),
+    fetchMemberId() {
+      let path = window.location.pathname;
+      if (path.includes('nutrition')) {
+        let regex = /^\/clients\/(\d+)\/nutrition/i;
+        let match = path.match(regex);
+        if (match[1]) {
+          return Number(match[1]);
+        }
+      }
+    },
+    decreaseDate() {
+      this.dayCounter++;
+      let today = new moment(this.date);
+      today.subtract(this.dayCounter, "days");
+      this.date = today.format('MMM DD, YYYY');
+      this.dayCounter = 0;
+    },
+    increaseDate() {
+      let today = new moment(this.date);
+      today.add(1, "days");
+      this.date = today.format('MMM DD, YYYY');
+    }
+  },
+  watch: {
+    date(val) {
+      this.loading = true
+      this.$store.commit('setStartDate',new Date(this.date));
+      this.$store.commit( 'setEndDate' ,new Date(this.date));
+      this.getNutritionSummary().then(() => {
+        this.loading = false
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>
 
 
 
