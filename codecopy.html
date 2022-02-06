@@ -1323,3 +1323,98 @@ if there are two jugs of water that is 3 liter and 5 liter and we want only 4 li
 ----Answer
 first we put water in five liter jug and fill it completely with water and then put water from this jug to 3 liter jug now the 5 liter jug has 2 liter water in it  and waste all the water of  
 3 liter jug now 5 liter jug has 2 liter water in it now put this water into 3 liter jug now the 3 liter jug has 2 liter water now again fill the 5 liter jug and put the one liter water from five liter jug to 3 liter jug and the remaing water is 4 liter.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<template>
+  <div v-if="IhaveAccess">
+    <h1>Umar Hayat</h1>
+    <!-- <vtable :view="view" />
+    <vfilters :view="view" /> -->
+    <label>First Name</label>
+    <input type="text" v-model="form.name">
+    <label>address</label>
+    <input type="text" v-model="form.address">
+    <label>Roll No</label>
+    <input type="text" v-model="form.roll_no">
+    <label>Password</label>
+    <input type="password" v-model="form.password">
+    <button @click="save">save Form</button>
+    <span v-if="defaultForms[view.id]"
+      ><formContainer :componentName="defaultForms[view.id]"
+    /></span>
+
+    <template v-for="action in defaultActions[view.id]">
+      <actionsContainer :componentName="action.template" />
+    </template>
+  </div>
+</template>
+
+<script>
+import formContainer from "@/components/forms/container";
+import actionsContainer from "@/components/actions/container";
+import vtable from "@/components/system/views/vtable";
+import vfilters from "@/components/system/views/vfilters";
+export default {
+  components: { formContainer, vtable, vfilters, actionsContainer },
+  beforeMount() {},
+  computed: {
+    IhaveAccess() {
+      if (this.IhaveRole("1")) {
+        return true;
+      }
+      var urls = [];
+      var apps = this.myApps;
+      Object.keys(apps).map((key) => {
+        var menus = apps[key].menus;
+        menus.map((menu) => urls.push(menu.url));
+      });
+      if (urls.indexOf(this.$route.path) > -1) {
+        return true;
+      }
+      return false;
+    },
+  },
+  data() {
+    return {
+      form:{
+        name:'',
+        address:'',
+        roll_no:'',
+        password:''
+      },
+      canAccess: false,
+      view: { id: this.$route.params.id },
+    };
+  },
+  methods:{
+    save()
+    {
+      this.db('modifyNode',{newItem:{
+        practice_name:this.form.name,
+        practice_address:this.form.address,
+        practice_roll_no:this.form.roll_no,
+        
+      },model:'practice'}).
+      then((result)=>{
+         alert('form submitted successfully');
+      })
+      console.log(this.form);
+    }
+  }
+};
+</script>
