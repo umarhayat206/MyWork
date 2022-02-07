@@ -1418,3 +1418,38 @@ export default {
   }
 };
 </script>
+
+Add Two Numbers without Using + sum operator
+using namespace std;
+
+
+int addNum(int num1, int num2)
+{
+     for(int i=0;i<num2;i++)
+     {
+        num1++;
+     }
+     
+     return num1;
+
+}
+int main() {
+  
+  cout << addNum(10,0);
+  return 0;
+}
+
+Even and odd number without using any comparison operator
+#include <iostream>
+using namespace std;
+void isEven(int n)
+{
+  string array[]={"even","odd"};
+  cout<<array[n%2];
+}
+int main() {
+  
+ isEven(10);
+  return 0;
+}
+
